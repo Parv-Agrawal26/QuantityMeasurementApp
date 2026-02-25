@@ -236,4 +236,126 @@ public class QuantityMeasurementAppTest {
         QuantityLength q3 = new QuantityLength(72.0, LengthUnit.INCH);
         assertTrue(q1.equals(q2) && q2.equals(q3) && q1.equals(q3), "Complex multi-unit scenario should work");
     }
+
+    // UC5: Unit-to-Unit Conversion Tests
+    @Test
+    public void testConversion_FeetToInches() {
+        double result = QuantityLength.convert(1.0, LengthUnit.FEET, LengthUnit.INCH);
+        assertEquals(12.0, result, 1e-6, "1.0 feet should convert to 12.0 inches");
+    }
+
+    @Test
+    public void testConversion_InchesToFeet() {
+        double result = QuantityLength.convert(24.0, LengthUnit.INCH, LengthUnit.FEET);
+        assertEquals(2.0, result, 1e-6, "24.0 inches should convert to 2.0 feet");
+    }
+
+    @Test
+    public void testConversion_YardsToInches() {
+        double result = QuantityLength.convert(1.0, LengthUnit.YARDS, LengthUnit.INCH);
+        assertEquals(36.0, result, 1e-6, "1.0 yard should convert to 36.0 inches");
+    }
+
+    @Test
+    public void testConversion_InchesToYards() {
+        double result = QuantityLength.convert(72.0, LengthUnit.INCH, LengthUnit.YARDS);
+        assertEquals(2.0, result, 1e-6, "72.0 inches should convert to 2.0 yards");
+    }
+
+    @Test
+    public void testConversion_CentimetersToInches() {
+        double result = QuantityLength.convert(2.54, LengthUnit.CENTIMETERS, LengthUnit.INCH);
+        assertEquals(1.0, result, 1e-3, "2.54 cm should convert to ~1.0 inches");
+    }
+
+    @Test
+    public void testConversion_FeetToYards() {
+        double result = QuantityLength.convert(6.0, LengthUnit.FEET, LengthUnit.YARDS);
+        assertEquals(2.0, result, 1e-6, "6.0 feet should convert to 2.0 yards");
+    }
+
+    @Test
+    public void testConversion_RoundTrip_PreservesValue() {
+        double original = 5.0;
+        double converted = QuantityLength.convert(original, LengthUnit.FEET, LengthUnit.INCH);
+        double backConverted = QuantityLength.convert(converted, LengthUnit.INCH, LengthUnit.FEET);
+        assertEquals(original, backConverted, 1e-6, "Round-trip conversion should preserve original value");
+    }
+
+    @Test
+    public void testConversion_ZeroValue() {
+        double result = QuantityLength.convert(0.0, LengthUnit.FEET, LengthUnit.INCH);
+        assertEquals(0.0, result, 1e-6, "Zero should convert to zero");
+    }
+
+    @Test
+    public void testConversion_NegativeValue() {
+        double result = QuantityLength.convert(-1.0, LengthUnit.FEET, LengthUnit.INCH);
+        assertEquals(-12.0, result, 1e-6, "Negative values should convert correctly");
+    }
+
+    @Test
+    public void testConversion_SameUnit() {
+        double result = QuantityLength.convert(5.0, LengthUnit.FEET, LengthUnit.FEET);
+        assertEquals(5.0, result, 1e-6, "Same unit conversion should return original value");
+    }
+
+    @Test
+    public void testConversion_InvalidUnit_Throws() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.convert(1.0, null, LengthUnit.FEET);
+        }, "Null source unit should throw IllegalArgumentException");
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.convert(1.0, LengthUnit.FEET, null);
+        }, "Null target unit should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testConversion_NaNValue_Throws() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.convert(Double.NaN, LengthUnit.FEET, LengthUnit.INCH);
+        }, "NaN value should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testConversion_InfiniteValue_Throws() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.convert(Double.POSITIVE_INFINITY, LengthUnit.FEET, LengthUnit.INCH);
+        }, "Infinite value should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testConvertTo_InstanceMethod() {
+        QuantityLength original = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength converted = original.convertTo(LengthUnit.INCH);
+        assertEquals(12.0, converted.getValue(), 1e-6, "Instance convertTo should work correctly");
+        assertEquals(LengthUnit.INCH, converted.getUnit(), "Converted unit should be correct");
+    }
+
+    @Test
+    public void testConvertTo_NullUnit_Throws() {
+        QuantityLength quantity = new QuantityLength(1.0, LengthUnit.FEET);
+        assertThrows(IllegalArgumentException.class, () -> {
+            quantity.convertTo(null);
+        }, "convertTo with null unit should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testQuantityLength_Constructor_InvalidInputs() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityLength(1.0, null);
+        }, "Constructor with null unit should throw IllegalArgumentException");
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityLength(Double.NaN, LengthUnit.FEET);
+        }, "Constructor with NaN value should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testToString_Method() {
+        QuantityLength quantity = new QuantityLength(1.5, LengthUnit.FEET);
+        String result = quantity.toString();
+        assertEquals("1.50 feet", result, "toString should format correctly");
+    }
 }
