@@ -490,4 +490,113 @@ public class QuantityMeasurementAppTest {
         assertEquals(1.0, q1.getValue(), 1e-6, "Original q1 should remain unchanged");
         assertEquals(2.0, q2.getValue(), 1e-6, "Original q2 should remain unchanged");
     }
+
+    // UC7: Addition with Target Unit Specification Tests
+    @Test
+    public void testAddition_ExplicitTargetUnit_Feet() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.FEET);
+        assertEquals(2.0, result.getValue(), 1e-6, "1 ft + 12 in should equal 2 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_Inches() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.INCH);
+        assertEquals(24.0, result.getValue(), 1e-6, "1 ft + 12 in should equal 24 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_Yards() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        assertEquals(0.667, result.getValue(), 1e-3, "1 ft + 12 in should equal ~0.667 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_Centimeters() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.INCH);
+        QuantityLength q2 = new QuantityLength(1.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.CENTIMETERS);
+        assertEquals(5.08, result.getValue(), 1e-2, "1 in + 1 in should equal ~5.08 cm");
+        assertEquals(LengthUnit.CENTIMETERS, result.getUnit(), "Result unit should be CENTIMETERS");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_SameAsFirstOperand() {
+        QuantityLength q1 = new QuantityLength(2.0, LengthUnit.YARDS);
+        QuantityLength q2 = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        assertEquals(3.0, result.getValue(), 1e-6, "2 yd + 3 ft should equal 3 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_SameAsSecondOperand() {
+        QuantityLength q1 = new QuantityLength(2.0, LengthUnit.YARDS);
+        QuantityLength q2 = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.FEET);
+        assertEquals(9.0, result.getValue(), 1e-6, "2 yd + 3 ft should equal 9 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_Commutativity() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result1 = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        QuantityLength result2 = QuantityLength.add(q2, q1, LengthUnit.YARDS);
+        assertEquals(result1.getValue(), result2.getValue(), 1e-6, "Addition should be commutative with explicit target unit");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_WithZero() {
+        QuantityLength q1 = new QuantityLength(5.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(0.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        assertEquals(1.667, result.getValue(), 1e-3, "5 ft + 0 in should equal ~1.667 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_NegativeValues() {
+        QuantityLength q1 = new QuantityLength(5.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(-2.0, LengthUnit.FEET);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.INCH);
+        assertEquals(36.0, result.getValue(), 1e-6, "5 ft + (-2 ft) should equal 36 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_NullTargetUnit() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.add(q1, q2, null);
+        }, "Null target unit should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_LargeToSmallScale() {
+        QuantityLength q1 = new QuantityLength(1000.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(500.0, LengthUnit.FEET);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.INCH);
+        assertEquals(18000.0, result.getValue(), 1e-6, "1000 ft + 500 ft should equal 18000 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testAddition_ExplicitTargetUnit_SmallToLargeScale() {
+        QuantityLength q1 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        assertEquals(0.667, result.getValue(), 1e-3, "12 in + 12 in should equal ~0.667 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
 }
