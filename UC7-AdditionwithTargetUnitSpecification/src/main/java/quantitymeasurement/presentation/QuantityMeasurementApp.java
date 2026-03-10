@@ -95,6 +95,18 @@ public class QuantityMeasurementApp {
         demonstrateLengthAddition(5.0, LengthUnit.FEET, -2.0, LengthUnit.FEET, LengthUnit.FEET);
         
         System.out.println();
+        System.out.println("=== UC7: Addition with Target Unit Specification Demo ===");
+        
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH, LengthUnit.FEET);
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH, LengthUnit.INCH);
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH, LengthUnit.YARDS);
+        demonstrateLengthAddition(1.0, LengthUnit.YARDS, 3.0, LengthUnit.FEET, LengthUnit.YARDS);
+        demonstrateLengthAddition(36.0, LengthUnit.INCH, 1.0, LengthUnit.YARDS, LengthUnit.FEET);
+        demonstrateLengthAddition(2.54, LengthUnit.CENTIMETERS, 1.0, LengthUnit.INCH, LengthUnit.CENTIMETERS);
+        demonstrateLengthAddition(5.0, LengthUnit.FEET, 0.0, LengthUnit.INCH, LengthUnit.YARDS);
+        demonstrateLengthAddition(5.0, LengthUnit.FEET, -2.0, LengthUnit.FEET, LengthUnit.INCH);
+        
+        System.out.println();
     
         boolean feetResult = service.checkFeetEquality(1.0, 1.0);
         System.out.println("Are 1.0 ft and 1.0 ft equal? " + feetResult);
