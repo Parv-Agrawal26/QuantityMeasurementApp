@@ -89,4 +89,43 @@ public class QuantityLength {
     public LengthUnit getUnit() {
         return unit;
     }
+
+    /**
+     * Adds another QuantityLength to this one and returns result in this object's unit.
+     * @param other the QuantityLength to add
+     * @return a new QuantityLength with the sum in this object's unit
+     * @throws IllegalArgumentException if other is null
+     */
+    public QuantityLength add(QuantityLength other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Cannot add null quantity");
+        }
+        double thisInFeet = this.getValueInFeet();
+        double otherInFeet = other.getValueInFeet();
+        double sumInFeet = thisInFeet + otherInFeet;
+        double sumInThisUnit = sumInFeet / this.unit.getConversionFactor();
+        return new QuantityLength(sumInThisUnit, this.unit);
+    }
+
+    /**
+     * Static method to add two QuantityLength objects and return result in specified unit.
+     * @param length1 first quantity
+     * @param length2 second quantity
+     * @param targetUnit unit for the result
+     * @return a new QuantityLength with the sum in target unit
+     * @throws IllegalArgumentException if any parameter is null
+     */
+    public static QuantityLength add(QuantityLength length1, QuantityLength length2, LengthUnit targetUnit) {
+        if (length1 == null || length2 == null) {
+            throw new IllegalArgumentException("Cannot add null quantities");
+        }
+        if (targetUnit == null) {
+            throw new IllegalArgumentException("Target unit cannot be null");
+        }
+        double value1InFeet = length1.getValueInFeet();
+        double value2InFeet = length2.getValueInFeet();
+        double sumInFeet = value1InFeet + value2InFeet;
+        double sumInTargetUnit = sumInFeet / targetUnit.getConversionFactor();
+        return new QuantityLength(sumInTargetUnit, targetUnit);
+    }
 }

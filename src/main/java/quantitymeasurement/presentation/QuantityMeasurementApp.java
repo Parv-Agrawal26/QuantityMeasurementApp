@@ -39,6 +39,27 @@ public class QuantityMeasurementApp {
         demonstrateLengthEquality(length1, length2);
     }
 
+    public static void demonstrateLengthAddition(QuantityLength length1, QuantityLength length2) {
+        try {
+            QuantityLength result = length1.add(length2);
+            System.out.printf("%s + %s = %s%n", length1.toString(), length2.toString(), result.toString());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Addition error: " + e.getMessage());
+        }
+    }
+
+    public static void demonstrateLengthAddition(double value1, LengthUnit unit1, double value2, LengthUnit unit2, LengthUnit targetUnit) {
+        try {
+            QuantityLength q1 = new QuantityLength(value1, unit1);
+            QuantityLength q2 = new QuantityLength(value2, unit2);
+            QuantityLength result = QuantityLength.add(q1, q2, targetUnit);
+            System.out.printf("%.2f %s + %.2f %s = %s%n", 
+                value1, unit1.name().toLowerCase(), value2, unit2.name().toLowerCase(), result.toString());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Addition error: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         QuantityService service = new QuantityService();
 
@@ -61,6 +82,17 @@ public class QuantityMeasurementApp {
      
         demonstrateLengthComparison(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH);
         demonstrateLengthComparison(1.0, LengthUnit.YARDS, 3.0, LengthUnit.FEET);
+        
+        System.out.println();
+        System.out.println("=== UC6: Addition of Two Length Units Demo ===");
+        
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 2.0, LengthUnit.FEET, LengthUnit.FEET);
+        demonstrateLengthAddition(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH, LengthUnit.FEET);
+        demonstrateLengthAddition(12.0, LengthUnit.INCH, 1.0, LengthUnit.FEET, LengthUnit.INCH);
+        demonstrateLengthAddition(1.0, LengthUnit.YARDS, 3.0, LengthUnit.FEET, LengthUnit.YARDS);
+        demonstrateLengthAddition(2.54, LengthUnit.CENTIMETERS, 1.0, LengthUnit.INCH, LengthUnit.CENTIMETERS);
+        demonstrateLengthAddition(5.0, LengthUnit.FEET, 0.0, LengthUnit.INCH, LengthUnit.FEET);
+        demonstrateLengthAddition(5.0, LengthUnit.FEET, -2.0, LengthUnit.FEET, LengthUnit.FEET);
         
         System.out.println();
     
