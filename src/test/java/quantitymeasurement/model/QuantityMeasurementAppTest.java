@@ -358,4 +358,136 @@ public class QuantityMeasurementAppTest {
         String result = quantity.toString();
         assertEquals("1.50 feet", result, "toString should format correctly");
     }
+
+    // UC6: Addition of Two Length Units Tests
+    @Test
+    public void testAddition_SameUnit_FeetPlusFeet() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(2.0, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(3.0, result.getValue(), 1e-6, "1 ft + 2 ft should equal 3 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_SameUnit_InchPlusInch() {
+        QuantityLength q1 = new QuantityLength(6.0, LengthUnit.INCH);
+        QuantityLength q2 = new QuantityLength(6.0, LengthUnit.INCH);
+        QuantityLength result = q1.add(q2);
+        assertEquals(12.0, result.getValue(), 1e-6, "6 in + 6 in should equal 12 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testAddition_CrossUnit_FeetPlusInches() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = q1.add(q2);
+        assertEquals(2.0, result.getValue(), 1e-6, "1 ft + 12 in should equal 2 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_CrossUnit_InchPlusFeet() {
+        QuantityLength q1 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength q2 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(24.0, result.getValue(), 1e-6, "12 in + 1 ft should equal 24 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testAddition_CrossUnit_YardPlusFeet() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.YARDS);
+        QuantityLength q2 = new QuantityLength(3.0, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(2.0, result.getValue(), 1e-6, "1 yd + 3 ft should equal 2 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
+
+    @Test
+    public void testAddition_CrossUnit_CentimeterPlusInch() {
+        QuantityLength q1 = new QuantityLength(2.54, LengthUnit.CENTIMETERS);
+        QuantityLength q2 = new QuantityLength(1.0, LengthUnit.INCH);
+        QuantityLength result = q1.add(q2);
+        assertEquals(5.08, result.getValue(), 1e-2, "2.54 cm + 1 in should equal ~5.08 cm");
+        assertEquals(LengthUnit.CENTIMETERS, result.getUnit(), "Result unit should be CENTIMETERS");
+    }
+
+    @Test
+    public void testAddition_Commutativity() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result1 = QuantityLength.add(q1, q2, LengthUnit.FEET);
+        QuantityLength result2 = QuantityLength.add(q2, q1, LengthUnit.FEET);
+        assertEquals(result1.getValue(), result2.getValue(), 1e-6, "Addition should be commutative");
+    }
+
+    @Test
+    public void testAddition_WithZero() {
+        QuantityLength q1 = new QuantityLength(5.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(0.0, LengthUnit.INCH);
+        QuantityLength result = q1.add(q2);
+        assertEquals(5.0, result.getValue(), 1e-6, "5 ft + 0 in should equal 5 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_NegativeValues() {
+        QuantityLength q1 = new QuantityLength(5.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(-2.0, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(3.0, result.getValue(), 1e-6, "5 ft + (-2 ft) should equal 3 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_NullSecondOperand() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        assertThrows(IllegalArgumentException.class, () -> {
+            q1.add(null);
+        }, "Adding null should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testAddition_StaticMethod_NullOperands() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        assertThrows(IllegalArgumentException.class, () -> {
+            QuantityLength.add(null, q1, LengthUnit.FEET);
+        }, "Null first operand should throw IllegalArgumentException");
+    }
+
+    @Test
+    public void testAddition_LargeValues() {
+        QuantityLength q1 = new QuantityLength(1e6, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(1e6, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(2e6, result.getValue(), 1e-6, "Large values should add correctly");
+    }
+
+    @Test
+    public void testAddition_SmallValues() {
+        QuantityLength q1 = new QuantityLength(0.001, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(0.002, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(0.003, result.getValue(), 1e-6, "Small values should add correctly");
+    }
+
+    @Test
+    public void testAddition_StaticMethod_WithTargetUnit() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.YARDS);
+        QuantityLength q2 = new QuantityLength(36.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.FEET);
+        assertEquals(6.0, result.getValue(), 1e-6, "1 yd + 36 in should equal 6 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testAddition_Immutability() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(2.0, LengthUnit.FEET);
+        QuantityLength result = q1.add(q2);
+        assertEquals(1.0, q1.getValue(), 1e-6, "Original q1 should remain unchanged");
+        assertEquals(2.0, q2.getValue(), 1e-6, "Original q2 should remain unchanged");
+    }
 }
