@@ -710,3 +710,207 @@ public class QuantityMeasurementAppTest {
         assertEquals(original, backToFeet, 1e-6, "Round-trip conversion should preserve value in refactored design");
     }
 }
+
+    // UC9: Weight Measurement Tests
+    @Test
+    public void testEquality_KilogramToKilogram_SameValue() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        assertTrue(w1.equals(w2), "1.0 kg should equal 1.0 kg");
+    }
+
+    @Test
+    public void testEquality_KilogramToKilogram_DifferentValue() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(2.0, WeightUnit.KILOGRAM);
+        assertFalse(w1.equals(w2), "1.0 kg should not equal 2.0 kg");
+    }
+
+    @Test
+    public void testEquality_KilogramToGram_EquivalentValue() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1000.0, WeightUnit.GRAM);
+        assertTrue(w1.equals(w2), "1.0 kg should equal 1000.0 grams");
+    }
+
+    @Test
+    public void testEquality_GramToKilogram_EquivalentValue() {
+        QuantityWeight w1 = new QuantityWeight(1000.0, WeightUnit.GRAM);
+        QuantityWeight w2 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        assertTrue(w1.equals(w2), "1000.0 grams should equal 1.0 kg");
+    }
+
+    @Test
+    public void testEquality_WeightVsLength_Incompatible() {
+        QuantityWeight weight = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityLength length = new QuantityLength(1.0, LengthUnit.FEET);
+        assertFalse(weight.equals(length), "Weight and length should not be equal");
+    }
+
+    @Test
+    public void testEquality_Weight_NullComparison() {
+        QuantityWeight weight = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        assertFalse(weight.equals(null), "Weight should not equal null");
+    }
+
+    @Test
+    public void testEquality_Weight_SameReference() {
+        QuantityWeight weight = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        assertTrue(weight.equals(weight), "Weight should equal itself");
+    }
+
+    @Test
+    public void testEquality_Weight_TransitiveProperty() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1000.0, WeightUnit.GRAM);
+        QuantityWeight w3 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        assertTrue(w1.equals(w2) && w2.equals(w3) && w1.equals(w3), "Transitive property should hold");
+    }
+
+    @Test
+    public void testEquality_Weight_ZeroValue() {
+        QuantityWeight w1 = new QuantityWeight(0.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(0.0, WeightUnit.GRAM);
+        assertTrue(w1.equals(w2), "Zero values should be equal across units");
+    }
+
+    @Test
+    public void testEquality_Weight_NegativeValue() {
+        QuantityWeight w1 = new QuantityWeight(-1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(-1000.0, WeightUnit.GRAM);
+        assertTrue(w1.equals(w2), "Negative values should convert correctly");
+    }
+
+    @Test
+    public void testEquality_Weight_LargeValue() {
+        QuantityWeight w1 = new QuantityWeight(1000000.0, WeightUnit.GRAM);
+        QuantityWeight w2 = new QuantityWeight(1000.0, WeightUnit.KILOGRAM);
+        assertTrue(w1.equals(w2), "Large values should maintain precision");
+    }
+
+    @Test
+    public void testEquality_Weight_SmallValue() {
+        QuantityWeight w1 = new QuantityWeight(0.001, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1.0, WeightUnit.GRAM);
+        assertTrue(w1.equals(w2), "Small values should maintain precision");
+    }
+
+    @Test
+    public void testConversion_Weight_PoundToKilogram() {
+        double result = QuantityWeight.convert(2.20462, WeightUnit.POUND, WeightUnit.KILOGRAM);
+        assertEquals(1.0, result, 1e-3, "2.20462 pounds should convert to ~1.0 kg");
+    }
+
+    @Test
+    public void testConversion_Weight_KilogramToPound() {
+        double result = QuantityWeight.convert(1.0, WeightUnit.KILOGRAM, WeightUnit.POUND);
+        assertEquals(2.20462, result, 1e-3, "1.0 kg should convert to ~2.20462 pounds");
+    }
+
+    @Test
+    public void testConversion_Weight_SameUnit() {
+        double result = QuantityWeight.convert(5.0, WeightUnit.KILOGRAM, WeightUnit.KILOGRAM);
+        assertEquals(5.0, result, 1e-6, "Same unit conversion should return original value");
+    }
+
+    @Test
+    public void testConversion_Weight_ZeroValue() {
+        double result = QuantityWeight.convert(0.0, WeightUnit.KILOGRAM, WeightUnit.GRAM);
+        assertEquals(0.0, result, 1e-6, "Zero should convert to zero");
+    }
+
+    @Test
+    public void testConversion_Weight_NegativeValue() {
+        double result = QuantityWeight.convert(-1.0, WeightUnit.KILOGRAM, WeightUnit.GRAM);
+        assertEquals(-1000.0, result, 1e-6, "Negative values should convert correctly");
+    }
+
+    @Test
+    public void testConversion_Weight_RoundTrip() {
+        double original = 1.5;
+        double converted = QuantityWeight.convert(original, WeightUnit.KILOGRAM, WeightUnit.GRAM);
+        double backConverted = QuantityWeight.convert(converted, WeightUnit.GRAM, WeightUnit.KILOGRAM);
+        assertEquals(original, backConverted, 1e-6, "Round-trip conversion should preserve value");
+    }
+
+    @Test
+    public void testAddition_Weight_SameUnit_KilogramPlusKilogram() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(2.0, WeightUnit.KILOGRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(3.0, result.getValue(), 1e-6, "1.0 kg + 2.0 kg should equal 3.0 kg");
+        assertEquals(WeightUnit.KILOGRAM, result.getUnit(), "Result should be in kilogram");
+    }
+
+    @Test
+    public void testAddition_Weight_CrossUnit_KilogramPlusGram() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1000.0, WeightUnit.GRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(2.0, result.getValue(), 1e-6, "1.0 kg + 1000.0 g should equal 2.0 kg");
+        assertEquals(WeightUnit.KILOGRAM, result.getUnit(), "Result should be in first operand's unit");
+    }
+
+    @Test
+    public void testAddition_Weight_CrossUnit_PoundPlusKilogram() {
+        QuantityWeight w1 = new QuantityWeight(2.20462, WeightUnit.POUND);
+        QuantityWeight w2 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(4.40924, result.getValue(), 1e-3, "2.20462 lb + 1.0 kg should equal ~4.40924 lb");
+    }
+
+    @Test
+    public void testAddition_Weight_ExplicitTargetUnit_Gram() {
+        QuantityWeight w1 = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1000.0, WeightUnit.GRAM);
+        QuantityWeight result = QuantityWeight.add(w1, w2, WeightUnit.GRAM);
+        assertEquals(2000.0, result.getValue(), 1e-6, "1.0 kg + 1000.0 g should equal 2000.0 g");
+        assertEquals(WeightUnit.GRAM, result.getUnit(), "Result should be in gram");
+    }
+
+    @Test
+    public void testAddition_Weight_WithZero() {
+        QuantityWeight w1 = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(0.0, WeightUnit.GRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(5.0, result.getValue(), 1e-6, "Adding zero should return original value");
+    }
+
+    @Test
+    public void testAddition_Weight_NegativeValues() {
+        QuantityWeight w1 = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(-2000.0, WeightUnit.GRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(3.0, result.getValue(), 1e-6, "5.0 kg + (-2000.0 g) should equal 3.0 kg");
+    }
+
+    @Test
+    public void testAddition_Weight_LargeValues() {
+        QuantityWeight w1 = new QuantityWeight(1e6, WeightUnit.KILOGRAM);
+        QuantityWeight w2 = new QuantityWeight(1e6, WeightUnit.KILOGRAM);
+        QuantityWeight result = w1.add(w2);
+        assertEquals(2e6, result.getValue(), 1e-6, "Large value addition should work correctly");
+    }
+
+    @Test
+    public void testQuantityWeight_Constructor_InvalidInputs() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityWeight(1.0, null);
+        }, "Constructor with null unit should throw exception");
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            new QuantityWeight(Double.NaN, WeightUnit.KILOGRAM);
+        }, "Constructor with NaN should throw exception");
+    }
+
+    @Test
+    public void testWeightUnit_ConversionMethods() {
+        assertEquals(1.0, WeightUnit.KILOGRAM.convertToBaseUnit(1.0), 1e-6);
+        assertEquals(0.001, WeightUnit.GRAM.convertToBaseUnit(1.0), 1e-6);
+        assertEquals(0.453592, WeightUnit.POUND.convertToBaseUnit(1.0), 1e-6);
+        
+        assertEquals(1.0, WeightUnit.KILOGRAM.convertFromBaseUnit(1.0), 1e-6);
+        assertEquals(1000.0, WeightUnit.GRAM.convertFromBaseUnit(1.0), 1e-6);
+        assertEquals(2.20462, WeightUnit.POUND.convertFromBaseUnit(1.0), 1e-3);
+    }
+}
