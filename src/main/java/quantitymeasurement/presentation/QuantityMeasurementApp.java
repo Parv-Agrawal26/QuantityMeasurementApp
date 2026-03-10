@@ -107,6 +107,16 @@ public class QuantityMeasurementApp {
         demonstrateLengthAddition(5.0, LengthUnit.FEET, -2.0, LengthUnit.FEET, LengthUnit.INCH);
         
         System.out.println();
+        System.out.println("=== UC8: Refactored Unit Enum Demo ===");
+        
+        System.out.printf("FEET.convertToBaseUnit(12.0) = %.2f%n", LengthUnit.FEET.convertToBaseUnit(12.0));
+        System.out.printf("INCH.convertToBaseUnit(12.0) = %.2f%n", LengthUnit.INCH.convertToBaseUnit(12.0));
+        System.out.printf("YARDS.convertToBaseUnit(1.0) = %.2f%n", LengthUnit.YARDS.convertToBaseUnit(1.0));
+        System.out.printf("FEET.convertFromBaseUnit(2.0) = %.2f%n", LengthUnit.FEET.convertFromBaseUnit(2.0));
+        System.out.printf("INCH.convertFromBaseUnit(1.0) = %.2f%n", LengthUnit.INCH.convertFromBaseUnit(1.0));
+        System.out.printf("YARDS.convertFromBaseUnit(3.0) = %.2f%n", LengthUnit.YARDS.convertFromBaseUnit(3.0));
+        
+        System.out.println();
     
         boolean feetResult = service.checkFeetEquality(1.0, 1.0);
         System.out.println("Are 1.0 ft and 1.0 ft equal? " + feetResult);

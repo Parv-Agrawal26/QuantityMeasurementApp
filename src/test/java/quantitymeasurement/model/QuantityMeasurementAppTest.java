@@ -599,4 +599,114 @@ public class QuantityMeasurementAppTest {
         assertEquals(0.667, result.getValue(), 1e-3, "12 in + 12 in should equal ~0.667 yd");
         assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
     }
+
+    // UC8: Refactoring Unit Enum to Standalone with Conversion Responsibility Tests
+    @Test
+    public void testLengthUnitEnum_FeetConstant() {
+        assertEquals(1.0, LengthUnit.FEET.getConversionFactor(), 1e-6, "FEET conversion factor should be 1.0");
+    }
+
+    @Test
+    public void testLengthUnitEnum_InchesConstant() {
+        assertEquals(0.0833, LengthUnit.INCH.getConversionFactor(), 1e-3, "INCH conversion factor should be ~0.0833");
+    }
+
+    @Test
+    public void testLengthUnitEnum_YardsConstant() {
+        assertEquals(3.0, LengthUnit.YARDS.getConversionFactor(), 1e-6, "YARDS conversion factor should be 3.0");
+    }
+
+    @Test
+    public void testLengthUnitEnum_CentimetersConstant() {
+        assertEquals(0.0328, LengthUnit.CENTIMETERS.getConversionFactor(), 1e-3, "CENTIMETERS conversion factor should be ~0.0328");
+    }
+
+    @Test
+    public void testConvertToBaseUnit_FeetToFeet() {
+        double result = LengthUnit.FEET.convertToBaseUnit(5.0);
+        assertEquals(5.0, result, 1e-6, "5 feet to base unit should be 5.0");
+    }
+
+    @Test
+    public void testConvertToBaseUnit_InchesToFeet() {
+        double result = LengthUnit.INCH.convertToBaseUnit(12.0);
+        assertEquals(1.0, result, 1e-6, "12 inches to base unit should be 1.0 feet");
+    }
+
+    @Test
+    public void testConvertToBaseUnit_YardsToFeet() {
+        double result = LengthUnit.YARDS.convertToBaseUnit(1.0);
+        assertEquals(3.0, result, 1e-6, "1 yard to base unit should be 3.0 feet");
+    }
+
+    @Test
+    public void testConvertToBaseUnit_CentimetersToFeet() {
+        double result = LengthUnit.CENTIMETERS.convertToBaseUnit(30.48);
+        assertEquals(1.0, result, 1e-2, "30.48 cm to base unit should be ~1.0 feet");
+    }
+
+    @Test
+    public void testConvertFromBaseUnit_FeetToFeet() {
+        double result = LengthUnit.FEET.convertFromBaseUnit(2.0);
+        assertEquals(2.0, result, 1e-6, "2.0 feet from base unit should be 2.0 feet");
+    }
+
+    @Test
+    public void testConvertFromBaseUnit_FeetToInches() {
+        double result = LengthUnit.INCH.convertFromBaseUnit(1.0);
+        assertEquals(12.0, result, 1e-6, "1.0 feet from base unit should be 12.0 inches");
+    }
+
+    @Test
+    public void testConvertFromBaseUnit_FeetToYards() {
+        double result = LengthUnit.YARDS.convertFromBaseUnit(3.0);
+        assertEquals(1.0, result, 1e-6, "3.0 feet from base unit should be 1.0 yard");
+    }
+
+    @Test
+    public void testConvertFromBaseUnit_FeetToCentimeters() {
+        double result = LengthUnit.CENTIMETERS.convertFromBaseUnit(1.0);
+        assertEquals(30.48, result, 1e-2, "1.0 feet from base unit should be ~30.48 cm");
+    }
+
+    @Test
+    public void testQuantityLengthRefactored_Equality() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        assertTrue(q1.equals(q2), "Refactored equality should work: 1 ft = 12 in");
+    }
+
+    @Test
+    public void testQuantityLengthRefactored_ConvertTo() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength result = q1.convertTo(LengthUnit.INCH);
+        assertEquals(12.0, result.getValue(), 1e-6, "Refactored convertTo should work: 1 ft = 12 in");
+        assertEquals(LengthUnit.INCH, result.getUnit(), "Result unit should be INCH");
+    }
+
+    @Test
+    public void testQuantityLengthRefactored_Add() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = q1.add(q2);
+        assertEquals(2.0, result.getValue(), 1e-6, "Refactored add should work: 1 ft + 12 in = 2 ft");
+        assertEquals(LengthUnit.FEET, result.getUnit(), "Result unit should be FEET");
+    }
+
+    @Test
+    public void testQuantityLengthRefactored_AddWithTargetUnit() {
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength result = QuantityLength.add(q1, q2, LengthUnit.YARDS);
+        assertEquals(0.667, result.getValue(), 1e-3, "Refactored add with target unit: 1 ft + 12 in = ~0.667 yd");
+        assertEquals(LengthUnit.YARDS, result.getUnit(), "Result unit should be YARDS");
+    }
+
+    @Test
+    public void testRoundTripConversion_RefactoredDesign() {
+        double original = 5.0;
+        double toInches = QuantityLength.convert(original, LengthUnit.FEET, LengthUnit.INCH);
+        double backToFeet = QuantityLength.convert(toInches, LengthUnit.INCH, LengthUnit.FEET);
+        assertEquals(original, backToFeet, 1e-6, "Round-trip conversion should preserve value in refactored design");
+    }
 }
