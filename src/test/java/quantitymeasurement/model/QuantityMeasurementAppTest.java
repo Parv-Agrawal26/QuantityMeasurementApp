@@ -1354,4 +1354,171 @@ public class QuantityMeasurementAppTest {
         Quantity<VolumeUnit> v2 = new Quantity<>(5.0, VolumeUnit.LITRE);
         assertEquals(2.0, v1.divide(v2), 1e-6, "Volume division should work");
     }
+
+    // UC13: Centralized Arithmetic Logic Tests
+    @Test
+    public void testRefactoring_ValidationConsistency_NullOperand() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        
+        // All operations should throw same exception for null operand
+        Exception addEx = assertThrows(IllegalArgumentException.class, () -> l1.add(null));
+        Exception subtractEx = assertThrows(IllegalArgumentException.class, () -> l1.subtract(null));
+        Exception divideEx = assertThrows(IllegalArgumentException.class, () -> l1.divide(null));
+        
+        assertEquals(addEx.getMessage(), subtractEx.getMessage(), "Add and subtract should have same null error message");
+        assertEquals(addEx.getMessage(), divideEx.getMessage(), "Add and divide should have same null error message");
+    }
+
+    @Test
+    public void testRefactoring_ValidationConsistency_CrossCategory() {
+        // Cross-category operations are prevented at compile time by generics
+        // This test verifies that the validation logic works for same-category operations
+        Quantity<LengthUnit> length1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> length2 = new Quantity<>(5.0, LengthUnit.FEET);
+        
+        // These should work fine (same category)
+        assertDoesNotThrow(() -> length1.add(length2));
+        assertDoesNotThrow(() -> length1.subtract(length2));
+        assertDoesNotThrow(() -> length1.divide(length2));
+        
+        // The cross-category prevention is enforced by the type system at compile time
+        // which is actually better than runtime checking
+    }
+
+    @Test
+    public void testRefactoring_ArithmeticOperation_ADD() {
+        // Test the enum directly (using reflection to access private enum)
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = l1.add(l2);
+        assertEquals(15.0, result.getValue(), 1e-6, "ADD operation should work correctly");
+    }
+
+    @Test
+    public void testRefactoring_ArithmeticOperation_SUBTRACT() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> result = l1.subtract(l2);
+        assertEquals(5.0, result.getValue(), 1e-6, "SUBTRACT operation should work correctly");
+    }
+
+    @Test
+    public void testRefactoring_ArithmeticOperation_DIVIDE() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        double result = l1.divide(l2);
+        assertEquals(2.0, result, 1e-6, "DIVIDE operation should work correctly");
+    }
+
+    @Test
+    public void testRefactoring_DivisionByZero_ConsistentHandling() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(0.0, LengthUnit.FEET);
+        
+        ArithmeticException ex = assertThrows(ArithmeticException.class, () -> l1.divide(l2));
+        assertEquals("Cannot divide by zero", ex.getMessage(), "Division by zero should have consistent message");
+    }
+
+    @Test
+    public void testRefactoring_UC12_BehaviorPreserved_Addition() {
+        // Verify all UC12 addition behavior is preserved
+        Quantity<LengthUnit> l1 = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(12.0, LengthUnit.INCH);
+        
+        Quantity<LengthUnit> result1 = l1.add(l2);
+        assertEquals(2.0, result1.getValue(), 1e-6, "Addition behavior should be preserved");
+        assertEquals(LengthUnit.FEET, result1.getUnit(), "Addition result unit should be preserved");
+        
+        Quantity<LengthUnit> result2 = l1.add(l2, LengthUnit.INCH);
+        assertEquals(24.0, result2.getValue(), 1e-6, "Addition with target unit should be preserved");
+        assertEquals(LengthUnit.INCH, result2.getUnit(), "Addition target unit should be preserved");
+    }
+
+    @Test
+    public void testRefactoring_UC12_BehaviorPreserved_Subtraction() {
+        // Verify all UC12 subtraction behavior is preserved
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(6.0, LengthUnit.INCH);
+        
+        Quantity<LengthUnit> result1 = l1.subtract(l2);
+        assertEquals(9.5, result1.getValue(), 1e-6, "Subtraction behavior should be preserved");
+        assertEquals(LengthUnit.FEET, result1.getUnit(), "Subtraction result unit should be preserved");
+        
+        Quantity<LengthUnit> result2 = l1.subtract(l2, LengthUnit.INCH);
+        assertEquals(114.0, result2.getValue(), 1e-6, "Subtraction with target unit should be preserved");
+        assertEquals(LengthUnit.INCH, result2.getUnit(), "Subtraction target unit should be preserved");
+    }
+
+    @Test
+    public void testRefactoring_UC12_BehaviorPreserved_Division() {
+        // Verify all UC12 division behavior is preserved
+        Quantity<LengthUnit> l1 = new Quantity<>(24.0, LengthUnit.INCH);
+        Quantity<LengthUnit> l2 = new Quantity<>(2.0, LengthUnit.FEET);
+        
+        double result = l1.divide(l2);
+        assertEquals(1.0, result, 1e-6, "Division behavior should be preserved");
+    }
+
+    @Test
+    public void testRefactoring_Immutability_Preserved() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        
+        // Perform operations
+        l1.add(l2);
+        l1.subtract(l2);
+        l1.divide(l2);
+        
+        // Verify originals unchanged
+        assertEquals(10.0, l1.getValue(), 1e-6, "Original l1 should remain unchanged");
+        assertEquals(5.0, l2.getValue(), 1e-6, "Original l2 should remain unchanged");
+    }
+
+    @Test
+    public void testRefactoring_AllCategories_WorkCorrectly() {
+        // Length
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        assertEquals(15.0, l1.add(l2).getValue(), 1e-6, "Length addition should work");
+        assertEquals(5.0, l1.subtract(l2).getValue(), 1e-6, "Length subtraction should work");
+        assertEquals(2.0, l1.divide(l2), 1e-6, "Length division should work");
+        
+        // Weight
+        Quantity<WeightUnit> w1 = new Quantity<>(10.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> w2 = new Quantity<>(5.0, WeightUnit.KILOGRAM);
+        assertEquals(15.0, w1.add(w2).getValue(), 1e-6, "Weight addition should work");
+        assertEquals(5.0, w1.subtract(w2).getValue(), 1e-6, "Weight subtraction should work");
+        assertEquals(2.0, w1.divide(w2), 1e-6, "Weight division should work");
+        
+        // Volume
+        Quantity<VolumeUnit> v1 = new Quantity<>(10.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> v2 = new Quantity<>(5.0, VolumeUnit.LITRE);
+        assertEquals(15.0, v1.add(v2).getValue(), 1e-6, "Volume addition should work");
+        assertEquals(5.0, v1.subtract(v2).getValue(), 1e-6, "Volume subtraction should work");
+        assertEquals(2.0, v1.divide(v2), 1e-6, "Volume division should work");
+    }
+
+    @Test
+    public void testRefactoring_TargetUnitValidation_Consistent() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        
+        // Both add and subtract should reject null target unit
+        assertThrows(IllegalArgumentException.class, () -> l1.add(l2, null));
+        assertThrows(IllegalArgumentException.class, () -> l1.subtract(l2, null));
+    }
+
+    @Test
+    public void testRefactoring_NonCommutative_Properties_Preserved() {
+        Quantity<LengthUnit> l1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(5.0, LengthUnit.FEET);
+        
+        // Subtraction non-commutativity
+        assertEquals(5.0, l1.subtract(l2).getValue(), 1e-6, "10 - 5 should equal 5");
+        assertEquals(-5.0, l2.subtract(l1).getValue(), 1e-6, "5 - 10 should equal -5");
+        
+        // Division non-commutativity
+        assertEquals(2.0, l1.divide(l2), 1e-6, "10 ÷ 5 should equal 2");
+        assertEquals(0.5, l2.divide(l1), 1e-6, "5 ÷ 10 should equal 0.5");
+    }
 }
