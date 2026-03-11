@@ -45,6 +45,11 @@ public class Quantity<U extends IMeasurable> {
         if (targetUnit == null)
             throw new IllegalArgumentException("Target unit cannot be null");
 
+        if (unit instanceof TemperatureUnit) {
+            double convertedValue = targetUnit.convertFromBaseUnit(unit.convertToBaseUnit(value));
+            return new Quantity<>(convertedValue, targetUnit);
+        }
+
         double baseValue = unit.convertToBaseUnit(value);
         double convertedValue = targetUnit.convertFromBaseUnit(baseValue);
 
@@ -80,6 +85,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> add(Quantity<U> other) {
+        this.unit.validateOperationSupport("ADD");
         validateArithmeticOperands(other, null, false);
         double resultBase = performBaseArithmetic(other, ArithmeticOperation.ADD);
         double resultInThisUnit = unit.convertFromBaseUnit(resultBase);
@@ -87,6 +93,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> add(Quantity<U> other, U targetUnit) {
+        this.unit.validateOperationSupport("ADD");
         validateArithmeticOperands(other, targetUnit, true);
         double resultBase = performBaseArithmetic(other, ArithmeticOperation.ADD);
         double resultInTargetUnit = targetUnit.convertFromBaseUnit(resultBase);
@@ -94,6 +101,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> subtract(Quantity<U> other) {
+        this.unit.validateOperationSupport("SUBTRACT");
         validateArithmeticOperands(other, null, false);
         double resultBase = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
         double resultInThisUnit = unit.convertFromBaseUnit(resultBase);
@@ -101,6 +109,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        this.unit.validateOperationSupport("SUBTRACT");
         validateArithmeticOperands(other, targetUnit, true);
         double resultBase = performBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
         double resultInTargetUnit = targetUnit.convertFromBaseUnit(resultBase);
@@ -108,6 +117,7 @@ public class Quantity<U extends IMeasurable> {
     }
 
     public double divide(Quantity<U> other) {
+        this.unit.validateOperationSupport("DIVIDE");
         validateArithmeticOperands(other, null, false);
         return performBaseArithmetic(other, ArithmeticOperation.DIVIDE);
     }
