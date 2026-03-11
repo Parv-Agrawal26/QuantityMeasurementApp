@@ -26,6 +26,28 @@ public class QuantityMeasurementApp {
         System.out.println(q1 + " + " + q2 + " = " + q1.add(q2, targetUnit));
     }
 
+    public static <U extends IMeasurable> void demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        System.out.println(q1 + " - " + q2 + " = " + q1.subtract(q2));
+    }
+
+    public static <U extends IMeasurable> void demonstrateSubtraction(
+            Quantity<U> q1,
+            Quantity<U> q2,
+            U targetUnit) {
+
+        System.out.println(q1 + " - " + q2 + " = " + q1.subtract(q2, targetUnit));
+    }
+
+    public static <U extends IMeasurable> void demonstrateDivision(
+            Quantity<U> q1,
+            Quantity<U> q2) {
+
+        System.out.println(q1 + " ÷ " + q2 + " = " + q1.divide(q2));
+    }
+
     public static void main(String[] args) {
 
         System.out.println("=== Length Operations ===");
@@ -42,6 +64,12 @@ public class QuantityMeasurementApp {
 
         demonstrateAddition(l1, l2, LengthUnit.FEET);
 
+        demonstrateSubtraction(l1, l2);
+
+        demonstrateSubtraction(l1, l2, LengthUnit.INCH);
+
+        demonstrateDivision(l1, l2);
+
 
         System.out.println("\n=== Weight Operations ===");
 
@@ -56,6 +84,12 @@ public class QuantityMeasurementApp {
         demonstrateConversion(w1, WeightUnit.GRAM);
 
         demonstrateAddition(w1, w2, WeightUnit.KILOGRAM);
+
+        demonstrateSubtraction(w1, w2);
+
+        demonstrateSubtraction(w1, w2, WeightUnit.GRAM);
+
+        demonstrateDivision(w1, w2);
 
 
         System.out.println("\n=== Volume Operations ===");
@@ -76,5 +110,11 @@ public class QuantityMeasurementApp {
         demonstrateAddition(v1, v2, VolumeUnit.LITRE);
 
         demonstrateAddition(v1, v3, VolumeUnit.MILLILITRE);
+
+        demonstrateSubtraction(v1, v2);
+
+        demonstrateSubtraction(v1, v3, VolumeUnit.LITRE);
+
+        demonstrateDivision(v1, v2);
     }
 }

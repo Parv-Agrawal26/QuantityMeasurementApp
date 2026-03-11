@@ -58,6 +58,53 @@ public class Quantity<U extends IMeasurable> {
         return new Quantity<>(sumTarget, targetUnit);
     }
 
+    public Quantity<U> subtract(Quantity<U> other) {
+
+        if (other == null)
+            throw new IllegalArgumentException("Cannot subtract null quantity");
+
+        double thisBase = unit.convertToBaseUnit(value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        double differenceBase = thisBase - otherBase;
+
+        double differenceInThisUnit = unit.convertFromBaseUnit(differenceBase);
+
+        return new Quantity<>(differenceInThisUnit, unit);
+    }
+
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+
+        if (other == null)
+            throw new IllegalArgumentException("Cannot subtract null quantity");
+
+        if (targetUnit == null)
+            throw new IllegalArgumentException("Target unit cannot be null");
+
+        double thisBase = unit.convertToBaseUnit(value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        double differenceBase = thisBase - otherBase;
+
+        double differenceTarget = targetUnit.convertFromBaseUnit(differenceBase);
+
+        return new Quantity<>(differenceTarget, targetUnit);
+    }
+
+    public double divide(Quantity<U> other) {
+
+        if (other == null)
+            throw new IllegalArgumentException("Cannot divide by null quantity");
+
+        double thisBase = unit.convertToBaseUnit(value);
+        double otherBase = other.unit.convertToBaseUnit(other.value);
+
+        if (otherBase == 0.0)
+            throw new ArithmeticException("Cannot divide by zero");
+
+        return thisBase / otherBase;
+    }
+
     @Override
     public boolean equals(Object obj) {
 
