@@ -1,15 +1,14 @@
 package quantitymeasurement.model;
 
-public enum LengthUnit implements IMeasurable {
+public enum VolumeUnit implements IMeasurable {
 
-    FEET(1.0),
-    INCH(1.0 / 12.0),
-    YARDS(3.0),
-    CENTIMETERS(1.0 / 12.0 * 0.393701);
+    LITRE(1.0),
+    MILLILITRE(0.001),
+    GALLON(3.78541);
 
     private final double conversionFactor;
 
-    LengthUnit(double conversionFactor) {
+    VolumeUnit(double conversionFactor) {
         this.conversionFactor = conversionFactor;
     }
 

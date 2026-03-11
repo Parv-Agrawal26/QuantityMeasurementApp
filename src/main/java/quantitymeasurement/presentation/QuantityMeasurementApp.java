@@ -34,11 +34,11 @@ public class QuantityMeasurementApp {
                 new Quantity<>(1.0, LengthUnit.FEET);
 
         Quantity<LengthUnit> l2 =
-                new Quantity<>(12.0, LengthUnit.INCHES);
+                new Quantity<>(12.0, LengthUnit.INCH);
 
         demonstrateEquality(l1, l2);
 
-        demonstrateConversion(l1, LengthUnit.INCHES);
+        demonstrateConversion(l1, LengthUnit.INCH);
 
         demonstrateAddition(l1, l2, LengthUnit.FEET);
 
@@ -56,5 +56,25 @@ public class QuantityMeasurementApp {
         demonstrateConversion(w1, WeightUnit.GRAM);
 
         demonstrateAddition(w1, w2, WeightUnit.KILOGRAM);
+
+
+        System.out.println("\n=== Volume Operations ===");
+
+        Quantity<VolumeUnit> v1 =
+                new Quantity<>(1.0, VolumeUnit.LITRE);
+
+        Quantity<VolumeUnit> v2 =
+                new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+
+        Quantity<VolumeUnit> v3 =
+                new Quantity<>(1.0, VolumeUnit.GALLON);
+
+        demonstrateEquality(v1, v2);
+
+        demonstrateConversion(v1, VolumeUnit.MILLILITRE);
+
+        demonstrateAddition(v1, v2, VolumeUnit.LITRE);
+
+        demonstrateAddition(v1, v3, VolumeUnit.MILLILITRE);
     }
 }
