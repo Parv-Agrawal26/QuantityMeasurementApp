@@ -48,6 +48,17 @@ public class QuantityMeasurementApp {
         System.out.println(q1 + " ÷ " + q2 + " = " + q1.divide(q2));
     }
 
+    public static <U extends IMeasurable> void demonstrateUnsupportedOperation(
+            String operationName,
+            Runnable operation) {
+
+        try {
+            operation.run();
+        } catch (UnsupportedOperationException e) {
+            System.out.println("[ERROR] " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
 
         System.out.println("=== Length Operations ===");
@@ -116,5 +127,38 @@ public class QuantityMeasurementApp {
         demonstrateSubtraction(v1, v3, VolumeUnit.LITRE);
 
         demonstrateDivision(v1, v2);
+
+
+        System.out.println("\n=== Temperature Operations ===");
+
+        Quantity<TemperatureUnit> t1 =
+                new Quantity<>(0.0, TemperatureUnit.CELSIUS);
+
+        Quantity<TemperatureUnit> t2 =
+                new Quantity<>(32.0, TemperatureUnit.FAHRENHEIT);
+
+        Quantity<TemperatureUnit> t3 =
+                new Quantity<>(100.0, TemperatureUnit.CELSIUS);
+
+        Quantity<TemperatureUnit> t4 =
+                new Quantity<>(212.0, TemperatureUnit.FAHRENHEIT);
+
+        demonstrateEquality(t1, t2);
+
+        demonstrateEquality(t3, t4);
+
+        demonstrateConversion(t1, TemperatureUnit.FAHRENHEIT);
+
+        demonstrateConversion(t3, TemperatureUnit.FAHRENHEIT);
+
+        demonstrateConversion(t2, TemperatureUnit.CELSIUS);
+
+        System.out.println("\n=== Temperature Unsupported Operations ===");
+
+        demonstrateUnsupportedOperation("Addition", () -> t1.add(t3));
+
+        demonstrateUnsupportedOperation("Subtraction", () -> t1.subtract(t3));
+
+        demonstrateUnsupportedOperation("Division", () -> t1.divide(t3));
     }
 }
