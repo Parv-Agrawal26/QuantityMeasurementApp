@@ -1,6 +1,13 @@
 package quantitymeasurement.model;
 
 import org.junit.jupiter.api.Test;
+
+import quantitymeasurement.units.IMeasurable;
+import quantitymeasurement.units.LengthUnit;
+import quantitymeasurement.units.TemperatureUnit;
+import quantitymeasurement.units.VolumeUnit;
+import quantitymeasurement.units.WeightUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TemperatureTest {

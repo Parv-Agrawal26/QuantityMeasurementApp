@@ -1,65 +1,49 @@
 package quantitymeasurement.model;
+
+import quantitymeasurement.units.WeightUnit;
+
 public class QuantityWeight {
+
     private final double value;
     private final WeightUnit unit;
 
     public QuantityWeight(double value, WeightUnit unit) {
-        if (unit == null) {
+        if (unit == null)
             throw new IllegalArgumentException("Unit cannot be null");
-        }
-        if (!Double.isFinite(value)) {
+        if (!Double.isFinite(value))
             throw new IllegalArgumentException("Value must be finite");
-        }
         this.value = value;
         this.unit = unit;
     }
 
     public QuantityWeight convertTo(WeightUnit targetUnit) {
-        if (targetUnit == null) {
+        if (targetUnit == null)
             throw new IllegalArgumentException("Target unit cannot be null");
-        }
-        double convertedValue = convert(this.value, this.unit, targetUnit);
-        return new QuantityWeight(convertedValue, targetUnit);
+        return new QuantityWeight(targetUnit.convertFromBaseUnit(unit.convertToBaseUnit(value)), targetUnit);
     }
 
     public static double convert(double value, WeightUnit sourceUnit, WeightUnit targetUnit) {
-        if (sourceUnit == null || targetUnit == null) {
+        if (sourceUnit == null || targetUnit == null)
             throw new IllegalArgumentException("Units cannot be null");
-        }
-        if (!Double.isFinite(value)) {
+        if (!Double.isFinite(value))
             throw new IllegalArgumentException("Value must be finite");
-        }
-        
-        double valueInKilogram = sourceUnit.convertToBaseUnit(value);
-        return targetUnit.convertFromBaseUnit(valueInKilogram);
+        return targetUnit.convertFromBaseUnit(sourceUnit.convertToBaseUnit(value));
     }
 
- 
     public QuantityWeight add(QuantityWeight other) {
-        if (other == null) {
+        if (other == null)
             throw new IllegalArgumentException("Cannot add null weight");
-        }
-        double thisInKg = this.getValueInKilogram();
-        double otherInKg = other.getValueInKilogram();
-        double sumInKg = thisInKg + otherInKg;
-        double sumInThisUnit = this.unit.convertFromBaseUnit(sumInKg);
-        return new QuantityWeight(sumInThisUnit, this.unit);
+        double sumBase = unit.convertToBaseUnit(value) + other.unit.convertToBaseUnit(other.value);
+        return new QuantityWeight(unit.convertFromBaseUnit(sumBase), unit);
     }
 
-   
-    public static QuantityWeight add(QuantityWeight weight1, QuantityWeight weight2, WeightUnit targetUnit) {
-        if (weight1 == null || weight2 == null) {
+    public static QuantityWeight add(QuantityWeight w1, QuantityWeight w2, WeightUnit targetUnit) {
+        if (w1 == null || w2 == null)
             throw new IllegalArgumentException("Cannot add null weights");
-        }
-        if (targetUnit == null) {
+        if (targetUnit == null)
             throw new IllegalArgumentException("Target unit cannot be null");
-        }
-        
-        double sum1InKg = weight1.getValueInKilogram();
-        double sum2InKg = weight2.getValueInKilogram();
-        double sumInKg = sum1InKg + sum2InKg;
-        double sumInTargetUnit = targetUnit.convertFromBaseUnit(sumInKg);
-        return new QuantityWeight(sumInTargetUnit, targetUnit);
+        double sumBase = w1.unit.convertToBaseUnit(w1.value) + w2.unit.convertToBaseUnit(w2.value);
+        return new QuantityWeight(targetUnit.convertFromBaseUnit(sumBase), targetUnit);
     }
 
     @Override
@@ -67,12 +51,12 @@ public class QuantityWeight {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         QuantityWeight that = (QuantityWeight) obj;
-        return Double.compare(this.getValueInKilogram(), that.getValueInKilogram()) == 0;
+        return Double.compare(unit.convertToBaseUnit(value), that.unit.convertToBaseUnit(that.value)) == 0;
     }
 
     @Override
     public int hashCode() {
-        long bits = Double.doubleToLongBits(getValueInKilogram());
+        long bits = Double.doubleToLongBits(unit.convertToBaseUnit(value));
         return (int) (bits ^ (bits >>> 32));
     }
 
@@ -81,16 +65,6 @@ public class QuantityWeight {
         return String.format("%.2f %s", value, unit.name().toLowerCase());
     }
 
-   
-    private double getValueInKilogram() {
-        return unit.convertToBaseUnit(value);
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public WeightUnit getUnit() {
-        return unit;
-    }
+    public double getValue() { return value; }
+    public WeightUnit getUnit() { return unit; }
 }
