@@ -1,6 +1,11 @@
 package quantitymeasurement.model;
 
 import org.junit.jupiter.api.Test;
+
+import quantitymeasurement.units.LengthUnit;
+import quantitymeasurement.units.VolumeUnit;
+import quantitymeasurement.units.WeightUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
