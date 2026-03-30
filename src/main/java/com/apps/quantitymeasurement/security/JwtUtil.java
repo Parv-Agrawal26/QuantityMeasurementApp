@@ -19,12 +19,12 @@ public class JwtUtil {
     @Value("${jwt.expiration-ms:86400000}") // 24 hours
     private long expirationMs;
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String email, String role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + expirationMs);
 
         return JWT.create()
-                .withSubject(username)
+                .withSubject(email)
                 .withClaim("role", role)
                 .withIssuedAt(now)
                 .withExpiresAt(expiry)
@@ -40,7 +40,7 @@ public class JwtUtil {
         }
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         DecodedJWT jwt = getVerifier().verify(token);
         return jwt.getSubject();
     }
