@@ -1,12 +1,9 @@
 package com.apps.quantitymeasurement.service;
 
-import com.apps.quantitymeasurement.dto.AuthRequestDTO;
-import com.apps.quantitymeasurement.dto.AuthResponseDTO;
-import com.apps.quantitymeasurement.dto.RegisterRequestDTO;
-import com.apps.quantitymeasurement.entity.UserEntity;
-import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
-import com.apps.quantitymeasurement.repository.UserRepository;
-import com.apps.quantitymeasurement.security.JwtUtil;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,9 +12,13 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import com.apps.quantitymeasurement.dto.AuthRequestDTO;
+import com.apps.quantitymeasurement.dto.AuthResponseDTO;
+import com.apps.quantitymeasurement.dto.RegisterRequestDTO;
+import com.apps.quantitymeasurement.entity.UserEntity;
+import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
+import com.apps.quantitymeasurement.repository.UserRepository;
+import com.apps.quantitymeasurement.security.JwtUtil;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
@@ -38,25 +39,25 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public AuthResponseDTO register(RegisterRequestDTO request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new QuantityMeasurementException("Username already exists");
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new QuantityMeasurementException("Email already exists");
         }
 
         UserEntity entity = new UserEntity();
-        entity.setUsername(request.getUsername());
+        entity.setEmail(request.getEmail());
         entity.setPassword(passwordEncoder.encode(request.getPassword()));
         entity.setRole("ROLE_USER");
 
         userRepository.save(entity);
 
-        String token = jwtUtil.generateToken(entity.getUsername(), entity.getRole());
+        String token = jwtUtil.generateToken(entity.getEmail(), entity.getRole());
         return new AuthResponseDTO(token);
     }
 
     @Override
     public AuthResponseDTO login(AuthRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = (User) authentication.getPrincipal();
         String role = user.getAuthorities().stream().findFirst().map(a -> a.getAuthority()).orElse("ROLE_USER");
