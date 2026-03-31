@@ -9,6 +9,6 @@ import com.apps.quantitymeasurement.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
-    Optional<UserEntity> findByUsername(String username);
-    boolean existsByUsername(String username);
+    Optional<UserEntity> findByEmail(String email);
+    boolean existsByEmail(String email);
 }

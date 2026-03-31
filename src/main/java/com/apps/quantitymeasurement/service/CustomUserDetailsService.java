@@ -22,10 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity entity = userRepository.findByUsername(username)
+        UserEntity entity = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         GrantedAuthority authority = new SimpleGrantedAuthority(entity.getRole());
-        return new User(entity.getUsername(), entity.getPassword(), Collections.singletonList(authority));
+        return new User(entity.getEmail(), entity.getPassword(), Collections.singletonList(authority));
     }
 }
