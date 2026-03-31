@@ -1,7 +1,10 @@
 package com.apps.quantitymeasurement.security;
 
+<<<<<<< HEAD
 import java.util.Arrays;
 
+=======
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +19,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+<<<<<<< HEAD
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+=======
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
 
 import com.apps.quantitymeasurement.service.CustomUserDetailsService;
 
@@ -30,6 +36,7 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+<<<<<<< HEAD
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
@@ -59,6 +66,18 @@ public class SecurityConfig {
                 .successHandler(oAuth2SuccessHandler)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+=======
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
 
         return http.build();
     }
@@ -68,6 +87,12 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+<<<<<<< HEAD
+=======
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -80,6 +105,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
+<<<<<<< HEAD
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -93,4 +119,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+=======
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
 }

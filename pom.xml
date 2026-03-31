@@ -62,11 +62,14 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<<<<<<< HEAD
 		
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
+=======
+>>>>>>> f5356c0f3deec36d5b5f16b8fd51376bcf09a17a
 	</dependencies>
 
 	<build>
