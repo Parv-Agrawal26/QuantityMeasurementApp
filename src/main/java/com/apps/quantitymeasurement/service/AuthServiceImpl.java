@@ -28,7 +28,7 @@ public class AuthServiceImpl implements IAuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
     @Autowired
     private AuthenticationManager authenticationManager;
 
