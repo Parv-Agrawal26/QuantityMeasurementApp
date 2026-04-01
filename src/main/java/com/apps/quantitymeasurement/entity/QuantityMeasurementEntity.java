@@ -1,5 +1,6 @@
 package com.apps.quantitymeasurement.entity;
 
+import com.apps.quantitymeasurement.entity.UserEntity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,10 @@ public class QuantityMeasurementEntity {
 	private String errorMessage;
 
 	private LocalDateTime createdAt;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private UserEntity user;
 
 	public QuantityMeasurementEntity() {
 	}
@@ -81,4 +86,7 @@ public class QuantityMeasurementEntity {
 
 	public LocalDateTime getCreatedAt() { return createdAt; }
 	public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+	public UserEntity getUser() { return user; }
+	public void setUser(UserEntity user) { this.user = user; }
 }

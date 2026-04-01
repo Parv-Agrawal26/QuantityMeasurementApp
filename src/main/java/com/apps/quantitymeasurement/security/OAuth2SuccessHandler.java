@@ -46,6 +46,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         clearAuthenticationAttributes(request);
         getRedirectStrategy().sendRedirect(request, response,
-                "http://127.0.0.1:5500/oauth2-callback.html?token=" + token);
+                "http://localhost:5173/oauth2-callback?token=" + token);
     }
 }
