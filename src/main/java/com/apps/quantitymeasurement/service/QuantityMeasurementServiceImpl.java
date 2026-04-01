@@ -3,10 +3,13 @@ package com.apps.quantitymeasurement.service;
 import com.apps.quantitymeasurement.dto.QuantityDTO;
 import com.apps.quantitymeasurement.dto.QuantityInputDTO;
 import com.apps.quantitymeasurement.entity.QuantityMeasurementEntity;
+import com.apps.quantitymeasurement.entity.UserEntity;
 import com.apps.quantitymeasurement.exception.QuantityMeasurementException;
 import com.apps.quantitymeasurement.repository.QuantityMeasurementRepository;
+import com.apps.quantitymeasurement.repository.UserRepository;
 import com.apps.quantitymeasurement.unit.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,14 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 
 	@Autowired
 	private QuantityMeasurementRepository repository;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	private UserEntity getCurrentUser() {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		return userRepository.findByEmail(email).orElse(null);
+	}
 
 	private IMeasurable getUnit(String measurementType, String unit) {
 		return switch (measurementType.toUpperCase()) {
@@ -42,6 +53,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setThatMeasurementType(q2.getMeasurementType());
 		}
 		entity.setCreatedAt(LocalDateTime.now());
+		entity.setUser(getCurrentUser());
 	}
 
 	@Override
@@ -65,6 +77,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setErrorMessage(e.getMessage());
 			entity.setOperation("COMPARE");
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		}
 		return repository.save(entity);
 	}
@@ -89,11 +102,13 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setResultValue(result);
 			entity.setResultUnit(target.getUnit());
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		} catch (Exception e) {
 			entity.setError(true);
 			entity.setErrorMessage(e.getMessage());
 			entity.setOperation("CONVERT");
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		}
 		return repository.save(entity);
 	}
@@ -125,6 +140,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setErrorMessage(e.getMessage());
 			entity.setOperation("ADD");
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		}
 		return repository.save(entity);
 	}
@@ -156,6 +172,7 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setErrorMessage(e.getMessage());
 			entity.setOperation("SUBTRACT");
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		}
 		return repository.save(entity);
 	}
@@ -190,22 +207,23 @@ public class QuantityMeasurementServiceImpl implements IQuantityMeasurementServi
 			entity.setErrorMessage(e.getMessage());
 			entity.setOperation("DIVIDE");
 			entity.setCreatedAt(LocalDateTime.now());
+			entity.setUser(getCurrentUser());
 		}
 		return repository.save(entity);
 	}
 
 	@Override
 	public List<QuantityMeasurementEntity> getHistory() {
-		return repository.findAll();
+		return repository.findByUser(getCurrentUser());
 	}
 
 	@Override
 	public List<QuantityMeasurementEntity> getHistoryByOperation(String operation) {
-		return repository.findByOperation(operation.toUpperCase());
+		return repository.findByUserAndOperation(getCurrentUser(), operation.toUpperCase());
 	}
 
 	@Override
 	public long getOperationCount(String operation) {
-		return repository.countByOperationAndErrorFalse(operation.toUpperCase());
+		return repository.countByUserAndOperationAndErrorFalse(getCurrentUser(), operation.toUpperCase());
 	}
 }

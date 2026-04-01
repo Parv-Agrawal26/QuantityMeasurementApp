@@ -45,15 +45,25 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/api/v1/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/login/oauth2/**",
-                    "/oauth2/**"
-                ).permitAll()
-                .anyRequest().authenticated()
+            	    .requestMatchers(
+            	        "/api/v1/auth/**",
+            	        "/v3/api-docs/**",
+            	        "/swagger-ui/**",
+            	        "/swagger-ui.html"
+            	    ).permitAll()
+            	    .requestMatchers(
+            	        "/api/v1/quantities/compare",
+            	        "/api/v1/quantities/convert",
+            	        "/api/v1/quantities/add",
+            	        "/api/v1/quantities/subtract",
+            	        "/api/v1/quantities/divide"
+            	    ).permitAll()
+            	    .requestMatchers(
+            	        "/api/v1/quantities/history",
+            	        "/api/v1/quantities/history/**",
+            	        "/api/v1/quantities/count/**"
+            	    ).authenticated()
+            	    .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
                 .successHandler(oAuth2SuccessHandler)
@@ -84,7 +94,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500"));
+        config.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5173"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
